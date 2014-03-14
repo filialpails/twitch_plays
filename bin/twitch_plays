@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+require 'twitch_plays'
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.on('-c', '--config-file FILE', 'Read configuration from FILE.') do |file|
+    options[:config_file] = file
+  end
+  opts.on_tail('--version', 'Print version and exit.') do
+    puts TwitchPlays::VERSION
+    exit
+  end
+end.parse!
+raise OptionParser::MissingArgument, '-c' if options[:config_file].nil?
+
+TwitchPlays.start(**options)

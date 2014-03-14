@@ -1,0 +1,37 @@
+# CONNECTION INFO
+:nick: TwitchPlaysSomething # same as Twitch username
+:password: # get one at http://twitchapps.com/tmi/
+:server: irc.twitch.tv
+:port: 6667
+:channel: '#TwitchPlaysSomething' # Twitch channel to listen on
+
+:log_line_length: 35 # Enough to fit a twitch username, a space, and "democracy"
+
+# KEYMAP
+# key names are as in X's keysymdef.h, without the leading XK_
+# (see http://cgit.freedesktop.org/xorg/proto/x11proto/plain/keysymdef.h)
+:keys:
+  :up: Up
+  :down: Down
+  :left: Left
+  :right: Right
+  :a: d
+  :b: c
+  :x: s
+  :y: x
+  :l: z
+  :r: a
+  :start: Return
+  :select: Tab
+  :save_state: F1
+
+# DEMOCRACY
+:use_democracy: false
+:start_in_democracy: false
+:democracy_ratio_needed: 0.67 # activate democracy when 2/3 of votes are for it
+:anarchy_ratio_needed: 0.33   # activate anarchy when 2/3 of votes are for it
+:voting_time: 10              # length of button voting time, in seconds
+
+# SAVESTATES
+:use_savestates: true
+:savestate_interval: 600      # time between savestates, in seconds
