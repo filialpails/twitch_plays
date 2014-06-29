@@ -6,13 +6,6 @@ module TwitchPlays
   class Plugin
     include Cinch::Plugin
 
-    TOUCH_DIRECTIONS = {
-      touch_up: [0, -50],
-      touch_down: [0, 50],
-      touch_left: [-50, 0],
-      touch_right: [50, 0]
-    }
-
     plugin_name = 'TwitchPlaysPlugin'
     listen_to :connect, method: :on_connect
     listen_to :message, method: :on_message
@@ -20,6 +13,14 @@ module TwitchPlays
     def initialize(*args)
       super
       @keys = config[:keys]
+      @use_touch = config[:use_touch]
+      touch_move_amount = config[:touch_move_amount]
+      @touch_directions = {
+        touch_up: [0, -touch_move_amount],
+        touch_down: [0, touch_move_amount],
+        touch_left: [-touch_move_amount, 0],
+        touch_right: [touch_move_amount, 0]
+      }
       @democracy_votes = 0
       @anarchy_votes = 0
       @use_democracy = config[:use_democracy]
@@ -52,7 +53,7 @@ module TwitchPlays
             @total_votes = 0
           end
           sleep @voting_time
-          next if @total_votes == 0
+          next if @total_votes.zero?
           winner = synchronize(:votes_mutex) do
             puts "VOTES:\n" + @button_votes.sort {|(_, count1), (_, count2)|
               count1 <=> count2
@@ -61,18 +62,17 @@ module TwitchPlays
             }.map {|(btn, percent)|
               format_log_line(btn, "#{percent}%")
             }.join("\n")
-            @button_votes.max_by {|(_, count)| count}
+            @button_votes.max_by {|(_, count)| count}[0]
           end
-          btn = winner[0]
-          case btn
+          case winner
           when :touch_up, :touch_down, :touch_left, :touch_right
-            Output.touch_move(*TOUCH_DIRECTIONS[btn])
+            Output.touch_move(*@touch_directions[winner])
           when :touch_press
             Output.touch_press
           when :touch_release
             Output.touch_release
           else
-            Output.press(@keys[btn])
+            Output.press(@keys[winner])
           end
         end
       end
@@ -124,6 +124,7 @@ module TwitchPlays
         end
       when /^(?:up|down|left|right|a|b|x|y|l|r|start|select)$/i
         btn = $&.to_sym
+        return unless @keys.has_key?(btn)
         if @democracy_mode
           synchronize(:votes_mutex) do
             @total_votes += 1
@@ -134,16 +135,19 @@ module TwitchPlays
         puts format_log_line(msg.user.nick, message.downcase)
         Output.press(@keys[btn])
       when /^(?:touch_up|touch_down|touch_left|touch_right)$/i
+        return unless @use_touch
+        btn = $&.to_sym
         if @democracy_mode
           synchronize(:votes_mutex) do
             @total_votes += 1
-            @button_votes[$&.to_sym] += 1
+            @button_votes[btn] += 1
           end
           return
         end
         puts format_log_line(msg.user.nick, message.downcase)
-        Output.touch_move(*TOUCH_DIRECTIONS[btn])
+        Output.touch_move(*@touch_directions[btn])
       when /^touch_press$/i
+        return unless @use_touch
         if @democracy_mode
           synchronize(:votes_mutex) do
             @total_votes += 1
@@ -154,6 +158,7 @@ module TwitchPlays
         puts format_log_line(msg.user.nick, message.downcase)
         Output.touch_press
       when /^touch_release$/i
+        return unless @use_touch
         if @democracy_mode
           synchronize(:votes_mutex) do
             @total_votes += 1
@@ -179,6 +184,9 @@ module TwitchPlays
         c.plugins.plugins = [Plugin]
         c.plugins.options[Plugin] = config
       end
+    end
+    trap('INT') do
+      bot.quit
     end
     bot.start
   end

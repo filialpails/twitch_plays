@@ -1,11 +1,13 @@
 # CONNECTION INFO
-:nick: TwitchPlaysSomething # same as Twitch username
-:password: # get one at http://twitchapps.com/tmi/
+:nick: twitchplaysbot # Twitch username in all lowercase
+:password: # Get one at http://twitchapps.com/tmi/
 :server: irc.twitch.tv
 :port: 6667
-:channel: '#TwitchPlaysSomething' # Twitch channel to listen on
+:channel: '#twitchplaysbot' # Twitch channel to listen on, all lowercase
 
 :log_line_length: 35 # Enough to fit a twitch username, a space, and "democracy"
+:use_touch: true
+:touch_move_amount: 50 # How many pixels to move the mouse when a touchscreen move is performed
 
 # KEYMAP
 # key names are as in X's keysymdef.h, without the leading XK_
