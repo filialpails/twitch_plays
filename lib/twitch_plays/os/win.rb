@@ -6,6 +6,14 @@ module TwitchPlays
       module User32
         extend FFI::Library
 
+        if FFI::Platform::ADDRESS_SIZE == 64
+          LONG_PTR = :int64
+          ULONG_PTR = :uint64
+        else
+          LONG_PTR = :long
+          ULONG_PTR = :ulong
+        end
+
         INPUT_MOUSE = 0x00
         INPUT_KEYBOARD = 0x01
 
@@ -39,18 +47,18 @@ module TwitchPlays
         class MouseInput < FFI::Struct
           layout(:dx, :long,
                  :dy, :long,
-                 :mouse_data, :uint,
-                 :flags, :uint,
-                 :time, :uint,
-                 :extra_info, :pointer)
+                 :mouse_data, :ulong,
+                 :flags, :ulong,
+                 :time, :ulong,
+                 :extra_info, ULONG_PTR)
         end
 
         class KeyboardInput < FFI::Struct
           layout(:vk, :ushort,
                  :scan, :ushort,
-                 :flags, :uint,
-                 :time, :uint,
-                 :extra_info, :pointer)
+                 :flags, :ulong,
+                 :time, :ulong,
+                 :extra_info, ULONG_PTR)
         end
 
         class InputEvent < FFI::Union
@@ -59,14 +67,14 @@ module TwitchPlays
         end
 
         class Input < FFI::Struct
-          layout(:type, :uint,
+          layout(:type, :ulong,
                  :evt, InputEvent)
         end
 
         ffi_lib 'user32'
         ffi_convention :stdcall
 
-        attach_function :SendInput, [:uint, :pointer, :int], :uint
+        attach_function :SendInput, [:uint, Input.ptr, :int], :uint
       end
 
       TRANSLATE_KEYS = {
@@ -105,7 +113,7 @@ module TwitchPlays
         evt[:flags] = 0
         evt[:time] = 0
         evt[:extra_info] = 0
-        User32.SendInput(1, [input], User32::Input.size)
+        User32.SendInput(1, input, User32::Input.size)
       end
 
       def self.touch_move(dx, dy)
@@ -118,7 +126,7 @@ module TwitchPlays
         evt[:flags] = User32::MOUSEEVENTF_MOVE
         evt[:time] = 0
         evt[:extra_info] = 0
-        User32.SendInput(1, [input], User32::Input.size)
+        User32.SendInput(1, input, User32::Input.size)
       end
 
       def self.touch_press
@@ -131,7 +139,7 @@ module TwitchPlays
         evt[:flags] = User32::MOUSEEVENTF_LEFTDOWN
         evt[:time] = 0
         evt[:extra_info] = 0
-        User32.SendInput(1, [input], User32::Input.size)
+        User32.SendInput(1, input, User32::Input.size)
       end
 
       def self.touch_release
@@ -144,7 +152,7 @@ module TwitchPlays
         evt[:flags] = User32::MOUSEEVENTF_LEFTUP
         evt[:time] = 0
         evt[:extra_info] = 0
-        User32.SendInput(1, [input], User32::Input.size)
+        User32.SendInput(1, input, User32::Input.size)
       end
     end
   end
