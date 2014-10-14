@@ -6,7 +6,7 @@ Yet another Twitch Plays Pokemon clone. MMO-ify any game over IRC.
 Prerequisites
 -------------
 
-Requires xdotool on Linux.
+Requires xdotool on Linux and OSX.
 
 
 Configuration
@@ -17,8 +17,17 @@ See config.yml for an example of a configuration file.
 Running
 -------
 
-Run it as...
-```sh
-$ twitch_plays --config-file FILE 2> irc.log
+IRC log will be interspersed with the player commands, unless stderr is redirected.
+
+sh:
+```Shell
+$ twitch_plays --config-file FILE 2> /dev/null
 ```
-...to pipe the IRC log to a file, otherwise it will be interspersed with the player commands.
+cmd.exe:
+```Batchfile
+twitch_plays --config-file FILE 2> nul
+```
+Powershell:
+```PowerShell
+twitch_plays --config-file FILE 2> $null
+```
