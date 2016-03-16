@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.author = 'Rob Steward'
   s.email = 'bobert_1234567890@hotmail.com'
   s.homepage = 'https://github.com/filialpails/twitch_plays'
-  s.license = 'GPL-3.0'
+  s.license = 'GPL-3.0+'
 
-  s.files = Dir['README.md', 'LICENSE', 'config.yml', 'lib/**/*.rb', 'bin/*']
+  s.files = Dir['README.md', 'LICENSE', 'example.config.yml', 'lib/**/*.rb', 'bin/*']
   s.bindir = 'bin'
   s.executables = ['twitch_plays']
   s.required_ruby_version = '~> 2.1'
