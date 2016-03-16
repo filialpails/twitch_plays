@@ -12,7 +12,7 @@ Requires xdotool on Linux and OSX.
 Configuration
 -------------
 
-See config.yml for an example of a configuration file.
+See example.config.yml for an example of a configuration file.
 
 Running
 -------
